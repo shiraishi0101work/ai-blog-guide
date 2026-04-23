@@ -555,6 +555,60 @@
     }
     .home-heading__title span { color: var(--orange); }
 
+    /* Group section headers */
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      margin: 4rem 0 2rem;
+    }
+    .group-header:first-of-type { margin-top: 0; }
+    .group-header__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.6rem 1.6rem;
+      border-radius: 100px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+    }
+    .group-header__badge--basic {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-lt) 100%);
+      color: #fff;
+    }
+    .group-header__badge--option {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-lt) 100%);
+      color: #fff;
+    }
+    .group-header__line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .group-header__title {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* Sidebar group label */
+    .sidebar__group-label {
+      padding: 1rem 2rem 0.4rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-sub);
+      text-transform: uppercase;
+    }
+    .sidebar__group-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.6rem 0;
+    }
+
     /* Footer */
     .footer {
       background: var(--navy-dk);
@@ -644,7 +698,7 @@
 <script>
 const sections = [
   {
-    id: 1, order_num: 1,
+    id: 1, order_num: 1, group: "basic",
     title: "画面概要",
     content: `■ 画面上部
 ・「AIで自動投稿」ボタン：AI自動投稿の設定画面へ移動
@@ -664,7 +718,7 @@ const sections = [
 ・名前・メール・パスワードの変更`
   },
   {
-    id: 2, order_num: 2,
+    id: 2, order_num: 2, group: "basic",
     title: "AIで自動投稿",
     content: `「AIで自動投稿」機能は、投稿する「トピック」を設定して希望する「曜日」「時間」に自動的に記事が投稿される機能です。
 
@@ -700,7 +754,7 @@ const sections = [
 →「自動投稿設定を完了する」で完了`
   },
   {
-    id: 3, order_num: 3,
+    id: 3, order_num: 3, group: "basic",
     title: "ペルソナ設定",
     content: `「ブログを見せたい相手」のペルソナ（人格）を設定することで、ターゲットに合わせた記事が生成されます。
 
@@ -722,7 +776,7 @@ const sections = [
 ペルソナを設定しない場合は「未設定（おまかせ）」を選択`
   },
   {
-    id: 4, order_num: 4,
+    id: 4, order_num: 4, group: "basic",
     title: "自分で記事生成",
     content: `「自分で記事生成」機能は、タイトル名やセクション名など細かく設定でき、即時生成が可能な機能です。記事の内容にこだわりたい方・お急ぎの方向けです。
 
@@ -749,7 +803,7 @@ SEO対策ワードを含めたタイトル・セクションに再生成
 → 生成された記事は「自分で生成した記事」タブに格納`
   },
   {
-    id: 5, order_num: 5,
+    id: 5, order_num: 5, group: "basic",
     title: "記事の確認・修正",
     content: `生成された記事の確認・修正・公開設定の方法を説明します。
 
@@ -781,8 +835,8 @@ SEO対策ワードを含めたタイトル・セクションに再生成
 ・メタディスクリプション：検索結果に表示される概要文の編集`
   },
   {
-    id: 6, order_num: 6,
-    title: "学習機能（オプション）",
+    id: 6, order_num: 6, group: "option",
+    title: "学習機能",
     content: `学習機能は、自社の情報・専門知識をAIに学習させることで、より精度の高い記事を生成できるオプション機能です。
 
 ■ 利用条件
@@ -810,8 +864,8 @@ SEO対策ワードを含めたタイトル・セクションに再生成
 ファイル名で検索も可能`
   },
   {
-    id: 7, order_num: 7,
-    title: "アナリティクス（オプション）",
+    id: 7, order_num: 7, group: "option",
+    title: "アナリティクス",
     content: `アナリティクス機能は、WordPressブログのGoogleアナリティクスデータを確認できるオプション機能です。
 
 ■ アクセス方法
@@ -844,6 +898,10 @@ let currentId = null;
 
 function renderSidebar(activeId) {
   const list = document.getElementById('sidebar-list');
+  const basicSections = sections.filter(s => s.group === 'basic');
+  const optionSections = sections.filter(s => s.group === 'option');
+  let num = 0;
+
   let html = `
     <li class="sidebar__item${!activeId ? ' active' : ''}" onclick="showHome()">
       <span class="sidebar__num" style="background:${!activeId ? 'var(--orange)' : ''}; color:${!activeId ? '#fff' : ''};">
@@ -852,18 +910,37 @@ function renderSidebar(activeId) {
       <span class="sidebar__item-label">トップ</span>
       <svg class="arrow" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
     </li>
-    <li style="height:1px;background:var(--border);margin:0.5rem 0;"></li>
+    <li class="sidebar__group-divider"></li>
+    <li class="sidebar__group-label" style="color:var(--navy);">基本機能</li>
   `;
-  sections.forEach((s, i) => {
+  basicSections.forEach(s => {
+    num++;
     const active = s.id === activeId;
     html += `
       <li class="sidebar__item${active ? ' active' : ''}" onclick="showSection(${s.id})">
-        <span class="sidebar__num" style="${active ? 'background:var(--orange);color:#fff;' : ''}">${i + 1}</span>
+        <span class="sidebar__num" style="${active ? 'background:var(--navy);color:#fff;' : ''}">${num}</span>
         <span class="sidebar__item-label">${s.title}</span>
         <svg class="arrow" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
       </li>
     `;
   });
+
+  html += `
+    <li class="sidebar__group-divider"></li>
+    <li class="sidebar__group-label" style="color:var(--orange);">オプション機能</li>
+  `;
+  optionSections.forEach(s => {
+    num++;
+    const active = s.id === activeId;
+    html += `
+      <li class="sidebar__item${active ? ' active' : ''}" onclick="showSection(${s.id})">
+        <span class="sidebar__num" style="${active ? 'background:var(--orange);color:#fff;' : ''}">${num}</span>
+        <span class="sidebar__item-label">${s.title}</span>
+        <svg class="arrow" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </li>
+    `;
+  });
+
   list.innerHTML = html;
 }
 
@@ -897,18 +974,16 @@ function renderContent(html) {
   return out;
 }
 
-function showHome() {
-  currentId = null;
-  renderSidebar(null);
-  const area = document.getElementById('content-area');
-  let cards = '';
-  sections.forEach((s, i) => {
+function makeCards(list, startNum) {
+  return list.map((s, i) => {
+    const n = startNum + i;
+    const numStr = n < 10 ? `0${n}` : `${n}`;
     const excerpt = s.content.replace(/■ |・|①|②|③/g, '').slice(0, 90);
-    cards += `
+    return `
       <article class="card" onclick="showSection(${s.id})">
         <div class="card__top"></div>
         <div class="card__body">
-          <div class="card__num">0${i + 1}</div>
+          <div class="card__num">${numStr}</div>
           <div class="card__title">${s.title}</div>
           <div class="card__excerpt">${excerpt}...</div>
         </div>
@@ -918,13 +993,35 @@ function showHome() {
         </div>
       </article>
     `;
-  });
+  }).join('');
+}
+
+function showHome() {
+  currentId = null;
+  renderSidebar(null);
+  const area = document.getElementById('content-area');
+  const basicSections = sections.filter(s => s.group === 'basic');
+  const optionSections = sections.filter(s => s.group === 'option');
+
   area.innerHTML = `
     <div class="home-heading">
       <div class="home-heading__label">CONTENTS</div>
       <div class="home-heading__title">機能ガイド<span>一覧</span></div>
     </div>
-    <div class="home-grid">${cards}</div>
+
+    <div class="group-header">
+      <span class="group-header__badge group-header__badge--basic">基本機能</span>
+      <span class="group-header__title">標準搭載の機能</span>
+      <div class="group-header__line"></div>
+    </div>
+    <div class="home-grid">${makeCards(basicSections, 1)}</div>
+
+    <div class="group-header">
+      <span class="group-header__badge group-header__badge--option">オプション機能</span>
+      <span class="group-header__title">プランにより利用可能</span>
+      <div class="group-header__line"></div>
+    </div>
+    <div class="home-grid">${makeCards(optionSections, basicSections.length + 1)}</div>
   `;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -934,6 +1031,8 @@ function showSection(id) {
   renderSidebar(id);
   const idx = sections.findIndex(s => s.id === id);
   const s = sections[idx];
+  const num = idx + 1;
+  const isOption = s.group === 'option';
   const prev = sections[idx - 1];
   const next = sections[idx + 1];
 
@@ -964,11 +1063,12 @@ function showSection(id) {
     </button>
     <div class="section-header">
       <div class="section-header__eyebrow">
-        <span class="section-header__num">${idx + 1}</span>
-        CHAPTER ${idx + 1}
+        <span class="section-header__num" style="${isOption ? 'background:linear-gradient(135deg,var(--orange) 0%,var(--orange-lt) 100%)' : ''}">${num}</span>
+        ${isOption ? 'OPTION' : 'BASIC'} &nbsp;CHAPTER ${num}
+        ${isOption ? `<span style="margin-left:0.8rem;background:rgba(250,103,43,0.12);border:1px solid rgba(250,103,43,0.3);border-radius:100px;padding:0.2rem 1rem;font-size:1.05rem;color:var(--orange);">オプション機能</span>` : `<span style="margin-left:0.8rem;background:rgba(0,64,139,0.08);border:1px solid rgba(0,64,139,0.2);border-radius:100px;padding:0.2rem 1rem;font-size:1.05rem;color:var(--navy);">基本機能</span>`}
       </div>
       <h2 class="section-header__title">${s.title}</h2>
-      <div class="section-header__divider"></div>
+      <div class="section-header__divider" style="${isOption ? 'background:linear-gradient(90deg,var(--orange) 0%,var(--orange-lt) 100%)' : ''}"></div>
     </div>
     <div class="section-strip" style="border-radius:0;margin-top:-2.4rem;margin-bottom:0.4rem;">
       <div class="section-strip__dot"></div>
